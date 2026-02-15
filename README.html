@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task 2: Data Collection &amp; Preprocessing</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Fira+Code:wght@400;500&display=swap');
+
+  :root {
+    --navy: #16213e;
+    --blue: #0f3460;
+    --accent: #e94560;
+    --green: #27ae60;
+    --purple: #8e44ad;
+    --orange: #f39c12;
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  /* ─── Navigation ─── */
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--navy);
+    color: #fff;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 52px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    overflow-x: auto;
+  }
+  .topnav .brand {
+    font-weight: 700;
+    font-size: 15px;
+    white-space: nowrap;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  .topnav a {
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 14px 10px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .topnav a:hover, .topnav a:focus {
+    color: #fff;
+    border-bottom-color: var(--accent);
+  }
+
+  /* ─── Layout ─── */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+
+  /* ─── Hero ─── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 44px 48px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -40px;
+    width: 250px;
+    height: 250px;
+    background: rgba(233,69,96,0.12);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px;
+    left: 30%;
+    width: 200px;
+    height: 200px;
+    background: rgba(39,174,96,0.08);
+    border-radius: 50%;
+  }
+  .hero h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .hero .subtitle {
+    font-size: 16px;
+    font-weight: 300;
+    opacity: 0.9;
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .hero .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    font-size: 13px;
+    opacity: 0.8;
+    position: relative;
+  }
+
+  /* ─── Sections ─── */
+  section {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+  }
+
+  h2 {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2 .icon {
+    width: 30px;
+    height: 30px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--blue);
+    margin: 20px 0 10px;
+  }
+
+  p { margin-bottom: 10px; }
+  strong { font-weight: 600; }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; color: var(--accent); }
+
+  /* ─── Overview box ─── */
+  .overview-box {
+    background: #eef3ff;
+    border-left: 4px solid var(--blue);
+    padding: 16px 20px;
+    border-radius: 0 10px 10px 0;
+    font-size: 15px;
+  }
+  .overview-box ol {
+    margin: 10px 0 0;
+    padding-left: 22px;
+  }
+  .overview-box li { margin-bottom: 4px; }
+
+  /* ─── Stats grid ─── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 700px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .stat {
+    background: linear-gradient(135deg, var(--navy), var(--blue));
+    color: #fff;
+    border-radius: 12px;
+    padding: 18px 12px;
+    text-align: center;
+    transition: transform 0.15s;
+  }
+  .stat:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .stat .value { font-size: 34px; font-weight: 700; line-height: 1.1; }
+  .stat .label { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+  .stat.red { background: linear-gradient(135deg, #e94560, #c0392b); }
+  .stat.green { background: linear-gradient(135deg, #27ae60, #1e8449); }
+  .stat.purple { background: linear-gradient(135deg, #8e44ad, #6c3483); }
+  .stat.orange { background: linear-gradient(135deg, #e67e22, #d35400); }
+
+  /* ─── Tables ─── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 16px;
+    font-size: 14px;
+  }
+  thead th {
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  thead th:first-child { border-radius: 8px 0 0 0; }
+  thead th:last-child { border-radius: 0 8px 0 0; }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr:nth-child(even) td { background: #f9fafb; }
+  tbody tr:hover td { background: #eef3ff; }
+
+  /* ─── Code ─── */
+  code {
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    background: #f0f2f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+  pre {
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    background: #1a1a2e;
+    color: #e2e8f0;
+    padding: 18px 22px;
+    border-radius: 10px;
+    overflow-x: auto;
+    line-height: 1.7;
+    margin: 8px 0 16px;
+    white-space: pre;
+  }
+  pre .comment { color: #6b7280; }
+  pre .cmd { color: #a8e6cf; }
+
+  /* ─── Tree view ─── */
+  .tree-view {
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    background: #1a1a2e;
+    color: #cbd5e1;
+    padding: 22px 26px;
+    border-radius: 10px;
+    line-height: 1.9;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .tree-view .root { color: #fbbf24; font-weight: 700; font-size: 15px; }
+  .tree-view .book { color: #60a5fa; font-weight: 600; }
+  .tree-view .title { color: #c4b5fd; }
+  .tree-view .dim { color: #6b7280; }
+
+  /* ─── File tree ─── */
+  .file-tree {
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    padding: 18px 22px;
+    border-radius: 10px;
+    line-height: 1.8;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .file-tree .dir { color: var(--blue); font-weight: 600; }
+  .file-tree .file { color: var(--text); }
+  .file-tree .note { color: var(--muted); font-size: 12px; }
+
+  /* ─── Pipeline ─── */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 12px 0;
+  }
+  @media (max-width: 700px) {
+    .pipeline { grid-template-columns: 1fr; }
+  }
+  .pipe-step {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--blue);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 18px;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .pipe-step:hover {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+  }
+  .pipe-step .step-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .pipe-step .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--blue);
+    color: #fff;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .pipe-step .step-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--navy);
+  }
+  .pipe-step ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    color: #4b5563;
+  }
+  .pipe-step li { margin-bottom: 3px; }
+
+  /* ─── Two columns ─── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 700px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  /* ─── Tags ─── */
+  .tag {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    margin-right: 4px;
+  }
+  .tag-easy { background: var(--green); }
+  .tag-medium { background: var(--orange); }
+  .tag-hard { background: var(--accent); }
+  .tag-penalty { background: var(--blue); }
+  .tag-definition { background: var(--purple); }
+  .tag-procedure { background: #0891b2; }
+  .tag-comparison { background: #d97706; }
+  .tag-multihop { background: #be123c; }
+
+  /* ─── Lists ─── */
+  ul, ol { padding-left: 22px; margin: 6px 0 12px; }
+  li { margin-bottom: 5px; }
+
+  /* ─── Footer ─── */
+  .footer {
+    text-align: center;
+    padding: 28px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  /* ─── Print ─── */
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .topnav { display: none; }
+    .container { padding: 0; max-width: 100%; }
+    section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; padding: 16px 20px; margin-bottom: 12px; }
+    .hero { print-color-adjust: exact; -webkit-print-color-adjust: exact; padding: 24px 30px; }
+    .stat { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .tree-view, pre { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════ TOP NAVIGATION ═══════ -->
+<nav class="topnav">
+  <div class="brand">Task 2</div>
+  <a href="#overview">Overview</a>
+  <a href="#data-source">Data Source</a>
+  <a href="#statistics">Statistics</a>
+  <a href="#structure">Structure</a>
+  <a href="#pipeline">Pipeline</a>
+  <a href="#outputs">Output Files</a>
+  <a href="#qa">Q&amp;A Dataset</a>
+  <a href="#howto">How to Run</a>
+  <a href="#files">File Structure</a>
+  <a href="#next">Next Steps</a>
+</nav>
+
+<div class="container">
+
+<!-- ═══════ HERO ═══════ -->
+<div class="hero">
+  <h1>Task 2: Data Collection &amp; Preprocessing</h1>
+  <div class="subtitle">Comparing PageIndex vs PageIndex + Light Knowledge Graph for Thai Criminal Law Q&amp;A Chatbot</div>
+  <div class="meta-row">
+    <span>Course: CS652 Applied Machine Learning</span>
+    <span>Student ID: 6809036087</span>
+    <span>Due: 14 February 2026</span>
+  </div>
+</div>
+
+<!-- ═══════ OVERVIEW ═══════ -->
+<section id="overview">
+  <h2><span class="icon">1</span> Overview</h2>
+  <div class="overview-box">
+    This task acquires, cleans, and preprocesses the <strong>Thai Criminal Code</strong> (ประมวลกฎหมายอาญา) dataset for building a legal Q&amp;A chatbot. The output feeds two downstream systems:
+    <ol>
+      <li><strong>PageIndex</strong> &mdash; a vector-free RAG approach using a hierarchical tree index</li>
+      <li><strong>Light Knowledge Graph</strong> &mdash; legal entities (sections, penalties, offenses) and their relationships</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══════ DATA SOURCE ═══════ -->
+<section id="data-source">
+  <h2><span class="icon">2</span> Data Source</h2>
+  <table>
+    <thead>
+      <tr><th>Item</th><th>Detail</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Source</strong></td><td><a href="https://github.com/PyThaiNLP/thai-law" target="_blank">PyThaiNLP/thai-law</a> (GitHub)</td></tr>
+      <tr><td><strong>Original</strong></td><td>Office of the Council of State (สำนักงานคณะกรรมการกฤษฎีกา)</td></tr>
+      <tr><td><strong>License</strong></td><td>Public domain (Thai Copyright Act, Article 7)</td></tr>
+      <tr><td><strong>Format</strong></td><td>CSV with 3 columns: <code>article</code>, <code>text</code>, <code>notes</code></td></tr>
+      <tr><td><strong>Download URL</strong></td><td style="word-break:break-all;"><code style="font-size:11px;">https://github.com/PyThaiNLP/thai-law/releases/download/criminal-csv-v0.1/criminal-datasets.csv</code></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════ STATISTICS ═══════ -->
+<section id="statistics">
+  <h2><span class="icon">3</span> Dataset Statistics</h2>
+  <div class="stats-grid">
+    <div class="stat"><div class="value">453</div><div class="label">Raw CSV Rows</div></div>
+    <div class="stat red"><div class="value">444</div><div class="label">Legal Sections (มาตรา)</div></div>
+    <div class="stat green"><div class="value">3</div><div class="label">Books (ภาค)</div></div>
+    <div class="stat purple"><div class="value">15</div><div class="label">Titles (ลักษณะ)</div></div>
+    <div class="stat orange"><div class="value">33</div><div class="label">Divisions (หมวด)</div></div>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Metric</th><th>Value</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Sections with imprisonment penalty (จำคุก)</td><td><strong>292</strong></td></tr>
+      <tr><td>Sections with fine penalty (ปรับ)</td><td><strong>257</strong></td></tr>
+      <tr><td>Sections with death penalty (ประหารชีวิต)</td><td><strong>42</strong></td></tr>
+      <tr><td>Cross-reference edges</td><td><strong>360</strong></td></tr>
+      <tr><td>Q&amp;A test questions</td><td><strong>20</strong></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════ STRUCTURE ═══════ -->
+<section id="structure">
+  <h2><span class="icon">4</span> Thai Criminal Code Structure</h2>
+  <div class="tree-view"><span class="root">ประมวลกฎหมายอาญา (Thai Criminal Code)</span>
+│
+├── <span class="book">ภาค 1: บทบัญญัติทั่วไป (General Provisions)</span> <span class="dim">&mdash; มาตรา 1&ndash;106</span>
+│   ├── <span class="title">ลักษณะ 1: บทบัญญัติที่ใช้แก่ความผิดทั่วไป</span> <span class="dim">(11 หมวด)</span>
+│   └── <span class="title">ลักษณะ 2: บทบัญญัติที่ใช้แก่ความผิดลหุโทษ</span>
+│
+├── <span class="book">ภาค 2: ความผิด (Offenses)</span> <span class="dim">&mdash; มาตรา 107&ndash;366</span>
+│   ├── <span class="title">ลักษณะ 1: ความมั่นคงแห่งราชอาณาจักร</span> <span class="dim">(4 หมวด)</span>
+│   ├── <span class="title">ลักษณะ 1/1: การก่อการร้าย</span>
+│   ├── <span class="title">ลักษณะ 2: การปกครอง</span> <span class="dim">(2 หมวด)</span>
+│   ├── <span class="title">ลักษณะ 3: การยุติธรรม</span> <span class="dim">(2 หมวด)</span>
+│   ├── <span class="title">ลักษณะ 4: ศาสนา</span>
+│   ├── <span class="title">ลักษณะ 5: ความสงบสุขของประชาชน</span>
+│   ├── <span class="title">ลักษณะ 6: ภยันตรายต่อประชาชน</span>
+│   ├── <span class="title">ลักษณะ 7: การปลอมและการแปลง</span> <span class="dim">(4 หมวด)</span>
+│   ├── <span class="title">ลักษณะ 8: การค้า</span>
+│   ├── <span class="title">ลักษณะ 9: เพศ</span>
+│   ├── <span class="title">ลักษณะ 10: ชีวิตและร่างกาย</span> <span class="dim">(4 หมวด)</span>
+│   ├── <span class="title">ลักษณะ 11: เสรีภาพและชื่อเสียง</span> <span class="dim">(3 หมวด)</span>
+│   └── <span class="title">ลักษณะ 12: ทรัพย์</span> <span class="dim">(8 หมวด)</span>
+│
+└── <span class="book">ภาค 3: ลหุโทษ (Petty Offenses)</span> <span class="dim">&mdash; มาตรา 367&ndash;398</span></div>
+</section>
+
+<!-- ═══════ PIPELINE ═══════ -->
+<section id="pipeline">
+  <h2><span class="icon">5</span> Preprocessing Pipeline</h2>
+  <p>The notebook (<code>task2_data_preprocessing.ipynb</code>) performs these steps:</p>
+
+  <!-- Overview cards -->
+  <div class="pipeline">
+    <div class="pipe-step">
+      <div class="step-header">
+        <span class="step-num">1</span>
+        <span class="step-title">Data Acquisition</span>
+      </div>
+      <ul>
+        <li>Downloads <code>criminal-datasets.csv</code> from PyThaiNLP/thai-law GitHub releases</li>
+        <li>Saves to <code>data/criminal-datasets.csv</code></li>
+      </ul>
+    </div>
+
+    <div class="pipe-step">
+      <div class="step-header">
+        <span class="step-num">2</span>
+        <span class="step-title">Data Cleaning</span>
+      </div>
+      <ul>
+        <li>Fills missing values (<code>text</code> &rarr; empty, <code>notes</code> &rarr; empty)</li>
+        <li>Normalizes Thai text using <code>pythainlp.util.normalize</code></li>
+        <li>Removes extra whitespace and empty rows</li>
+      </ul>
+    </div>
+
+    <div class="pipe-step">
+      <div class="step-header">
+        <span class="step-num">3</span>
+        <span class="step-title">Hierarchy Mapping</span>
+      </div>
+      <ul>
+        <li>Uses the <strong>official Thai Criminal Code structure</strong> as a lookup table</li>
+        <li>Maps each มาตรา to its ภาค / ลักษณะ / หมวด</li>
+        <li>Handles slash articles (e.g., 135/1&ndash;135/4, 269/1&ndash;269/15)</li>
+        <li>Separates 8 intro sections from 444 main sections</li>
+      </ul>
+    </div>
+
+    <div class="pipe-step">
+      <div class="step-header">
+        <span class="step-num">4</span>
+        <span class="step-title">Text Preprocessing</span>
+      </div>
+      <ul>
+        <li>Tokenizes Thai text using PyThaiNLP (<code>word_tokenize</code>, newmm engine)</li>
+        <li>Computes token counts per section</li>
+      </ul>
+    </div>
+
+    <div class="pipe-step">
+      <div class="step-header">
+        <span class="step-num">5</span>
+        <span class="step-title">Entity Extraction</span>
+      </div>
+      <ul>
+        <li><strong>Penalties:</strong> imprisonment (จำคุก), fines (ปรับ), death (ประหารชีวิต), detention (กักขัง), confiscation (ริบทรัพย์สิน)</li>
+        <li><strong>Cross-references:</strong> directed edges between citing sections</li>
+        <li><strong>Penalty combos:</strong> both_mandatory, both_optional, imprisonment_only, fine_only</li>
+        <li><strong>Legal terms:</strong> 26 key terms (ผู้ใด, ต้องระวางโทษ, ลักทรัพย์, ฆ่า, etc.)</li>
+        <li>Builds directed graph using NetworkX</li>
+      </ul>
+    </div>
+
+    <div class="pipe-step">
+      <div class="step-header">
+        <span class="step-num">6</span>
+        <span class="step-title">Q&amp;A Test Dataset</span>
+      </div>
+      <ul>
+        <li>20 manually curated questions in Thai</li>
+        <li>5 question types: penalty, definition, procedure, comparison, multi-hop</li>
+        <li>3 difficulty levels: easy (8), medium (8), hard (4)</li>
+        <li>Each with ground-truth answer and reference sections</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ รายละเอียดแต่ละขั้นตอน ═══════ -->
+
+<!-- ขั้นตอน 1 & 2 -->
+<section id="step-1-2">
+  <h2><span class="icon">5.1</span> การเก็บรวบรวมและทำความสะอาดข้อมูล</h2>
+
+  <div class="two-col">
+    <div>
+      <h3>ขั้นตอนที่ 1: เก็บรวบรวมข้อมูล</h3>
+      <p>ดาวน์โหลดไฟล์ CSV ดิบจาก PyThaiNLP/thai-law บน GitHub ซึ่งเป็นข้อมูลประมวลกฎหมายอาญาฉบับเต็ม</p>
+      <table>
+        <thead><tr><th>รายการ</th><th>ค่า</th></tr></thead>
+        <tbody>
+          <tr><td>จำนวนแถว</td><td>453 แถว</td></tr>
+          <tr><td>คอลัมน์</td><td><code>article</code>, <code>text</code>, <code>notes</code></td></tr>
+          <tr><td>แถวที่ 0&ndash;7</td><td>มาตราเกริ่นนำ (พ.ร.บ.ให้ใช้ประมวลกฎหมายอาญา)</td></tr>
+          <tr><td>แถวที่ 8</td><td>แถวว่าง (NaN) คั่นระหว่างส่วน</td></tr>
+          <tr><td>แถวที่ 9&ndash;452</td><td>มาตรา 1&ndash;398 (ตัวบทกฎหมายจริง)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>ขั้นตอนที่ 2: ทำความสะอาดข้อมูล</h3>
+      <p>เตรียมข้อความดิบให้พร้อมสำหรับประมวลผลในขั้นตอนถัดไป:</p>
+      <table>
+        <thead><tr><th>การดำเนินการ</th><th>รายละเอียด</th></tr></thead>
+        <tbody>
+          <tr><td>เติมค่าที่หายไป</td><td><code>text</code> &rarr; <code>""</code>, <code>notes</code> &rarr; <code>""</code></td></tr>
+          <tr><td>ปรับปกติภาษาไทย</td><td>ใช้ <code>pythainlp.util.normalize</code> แก้ไขอักขระไทยที่ผิดปกติ (สระลอย, วรรณยุกต์ผิดตำแหน่ง)</td></tr>
+          <tr><td>ลบช่องว่างส่วนเกิน</td><td>ลบช่องว่างซ้ำ, ช่องว่างหน้า/หลังข้อความ</td></tr>
+          <tr><td>ลบแถวว่าง</td><td>ลบ 1 แถว NaN ที่คั่นระหว่างมาตราเกริ่นนำกับมาตราหลัก</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ขั้นตอนที่ 3: Hierarchy Mapping -->
+<section id="step-3">
+  <h2><span class="icon">5.2</span> การจับคู่โครงสร้างลำดับชั้น &mdash; รายละเอียด</h2>
+
+  <div class="overview-box" style="margin-bottom:16px">
+    <strong>ปัญหา:</strong> ข้อมูลดิบ (CSV) มีแค่ 3 คอลัมน์ คือ article, text, notes &mdash; <strong>ไม่มีข้อมูลบอกว่ามาตราไหนอยู่ภาคไหน ลักษณะไหน หมวดไหน</strong> เราจึงต้องจับคู่แต่ละมาตราเข้ากับโครงสร้างทางการของประมวลกฎหมายอาญาเอง
+  </div>
+
+  <h3>โครงสร้างลำดับชั้น (4 ระดับ)</h3>
+  <div class="tree-view" style="margin-bottom:16px">ภาค (Book)              &larr; ระดับบนสุด (มี 3 ภาค)
+ └── ลักษณะ (Title)       &larr; ระดับกลาง (มี 15 ลักษณะ)
+      └── หมวด (Division)  &larr; ระดับล่าง (มี 33 หมวด)
+           └── มาตรา (Section) &larr; ตัวบทกฎหมาย (มี 444 มาตรา)</div>
+
+  <h3>วิธีการ: ใช้ตาราง Lookup</h3>
+  <p>สร้างตาราง lookup จากโครงสร้างทางการของประมวลกฎหมายอาญา โดยกำหนดช่วงหมายเลขมาตราที่อยู่ในแต่ละ ภาค/ลักษณะ/หมวด:</p>
+  <table>
+    <thead><tr><th>ช่วงมาตรา</th><th>ภาค</th><th>ลักษณะ</th><th>หมวด</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>ภาค 1 บทบัญญัติทั่วไป</td><td>ลักษณะ 1</td><td>หมวด 1 บทนิยาม</td></tr>
+      <tr><td>2 &ndash; 17</td><td>ภาค 1 บทบัญญัติทั่วไป</td><td>ลักษณะ 1</td><td>หมวด 2 การใช้กฎหมายอาญา</td></tr>
+      <tr><td>334 &ndash; 336</td><td>ภาค 2 ความผิด</td><td>ลักษณะ 12 ทรัพย์</td><td>หมวด 1 ลักทรัพย์และวิ่งราวทรัพย์</td></tr>
+      <tr><td>339 &ndash; 340</td><td>ภาค 2 ความผิด</td><td>ลักษณะ 12 ทรัพย์</td><td>หมวด 2 กรรโชก รีดเอาทรัพย์ ชิงทรัพย์ ปล้นทรัพย์</td></tr>
+      <tr><td>367 &ndash; 398</td><td>ภาค 3 ลหุโทษ</td><td>&mdash;</td><td>&mdash;</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:4px">เมื่อเจอมาตรา 339 &rarr; ดูว่า 339 อยู่ในช่วง 339&ndash;340 &rarr; จับคู่ได้เป็น <strong>ภาค 2 &gt; ลักษณะ 12 &gt; หมวด 2</strong></p>
+
+  <div class="two-col" style="margin-top:16px">
+    <div>
+      <h3>การจัดการมาตราทับ (Slash Articles)</h3>
+      <p>บางมาตรามีเครื่องหมาย <code>/</code> เช่น 135/1, 269/5 ซึ่งเป็นมาตราที่เพิ่มเข้ามาภายหลัง ต้องมีตาราง override แยกต่างหาก:</p>
+      <table>
+        <thead><tr><th>มาตราทับ</th><th>จัดเข้า</th></tr></thead>
+        <tbody>
+          <tr><td><strong>135/1 &ndash; 135/4</strong></td><td>ลักษณะ 1/1 ความผิดเกี่ยวกับการก่อการร้าย</td></tr>
+          <tr><td><strong>269/1 &ndash; 269/15</strong></td><td>หมวด 4 ความผิดเกี่ยวกับบัตรอิเล็กทรอนิกส์</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:4px">ระบบจะดูเลขฐาน (เช่น 135) แล้วใช้ตาราง override เพื่อจับคู่ให้ถูกต้อง</p>
+    </div>
+    <div>
+      <h3>การแยกมาตราเกริ่นนำ</h3>
+      <p>ใน CSV แถวที่ 0&ndash;7 (8 แถวแรก) เป็น <strong>พ.ร.บ. ให้ใช้ประมวลกฎหมายอาญา</strong> ไม่ใช่ตัวประมวลกฎหมายอาญาจริง ระบบจึงแยกออก:</p>
+      <ul>
+        <li><strong>8 มาตราเกริ่นนำ</strong> &rarr; เก็บไว้ใน <code>full_parsed_with_headers.csv</code></li>
+        <li><strong>444 มาตราหลัก</strong> (มาตรา 1&ndash;398 รวมมาตราทับ) &rarr; เก็บไว้ใน <code>preprocessed_criminal_code.csv</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>ตัวอย่างผลลัพธ์</h3>
+  <div class="tree-view">มาตรา 339 &rarr; ภาค 2: ความผิด &gt; ลักษณะ 12: ทรัพย์ &gt; หมวด 2: กรรโชก รีดเอาทรัพย์ ชิงทรัพย์ ปล้นทรัพย์
+
+มาตรา 135/2 &rarr; ภาค 2: ความผิด &gt; ลักษณะ 1/1: การก่อการร้าย
+
+มาตรา 391 &rarr; ภาค 3: ลหุโทษ</div>
+  <p style="margin-top:8px">ข้อมูลนี้ถูก export เป็น <code>hierarchy_tree.json</code> ซึ่งเป็นโครงสร้างต้นไม้แบบซ้อน (root &rarr; ภาค &rarr; ลักษณะ &rarr; หมวด &rarr; มาตรา) สำหรับนำไปสร้าง PageIndex ใน Task 3</p>
+</section>
+
+<!-- ขั้นตอนที่ 4: Text Preprocessing -->
+<section id="step-4">
+  <h2><span class="icon">5.3</span> การประมวลผลข้อความ &mdash; รายละเอียด</h2>
+
+  <h3>ทำไมต้องตัดคำ?</h3>
+  <div class="overview-box" style="margin-bottom:16px">
+    ภาษาไทย<strong>ไม่มีช่องว่างระหว่างคำ</strong> ต่างจากภาษาอังกฤษ ดังนั้นจึงต้องใช้ตัวตัดคำ (tokenizer) เพื่อระบุว่าแต่ละคำเริ่มและจบที่ตรงไหน ก่อนจะวิเคราะห์ข้อความได้
+  </div>
+
+  <h3>ตัวอย่างการตัดคำ</h3>
+  <div class="tree-view" style="margin-bottom:16px"><span style="color:#6b7280">ต้นฉบับ:</span>  <span style="color:#fbbf24">"ผู้ใดลักทรัพย์ของผู้อื่นต้องระวางโทษจำคุก"</span>
+
+<span style="color:#6b7280">ตัดคำแล้ว:</span> <span style="color:#a8e6cf">["ผู้ใด", "ลัก", "ทรัพย์", "ของ", "ผู้อื่น", "ต้อง", "ระวางโทษ", "จำคุก"]</span>
+
+<span style="color:#6b7280">จำนวน token:</span> <span style="color:#60a5fa">8</span></div>
+
+  <div class="two-col">
+    <div>
+      <h3>เครื่องมือที่ใช้</h3>
+      <table>
+        <thead><tr><th>รายการ</th><th>รายละเอียด</th></tr></thead>
+        <tbody>
+          <tr><td>ไลบรารี</td><td><strong>PyThaiNLP</strong> &mdash; ไลบรารี NLP สำหรับภาษาไทย</td></tr>
+          <tr><td>ฟังก์ชัน</td><td><code>word_tokenize(text, engine="newmm")</code></td></tr>
+          <tr><td>อัลกอริทึม</td><td><strong>newmm</strong> (New Maximum Matching) &mdash; จับคู่คำที่ยาวที่สุดก่อนโดยใช้พจนานุกรม</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>ผลลัพธ์</h3>
+      <p>หลังตัดคำ ระบบจะนับจำนวน token ในแต่ละมาตรา เก็บไว้ในคอลัมน์ <code>token_count</code> เพื่อ:</p>
+      <ul>
+        <li>ใช้ใน EDA &mdash; วิเคราะห์การกระจายความยาวข้อความ</li>
+        <li>ดูว่ามาตราไหนยาว/สั้นผิดปกติ</li>
+        <li>วางแผนการแบ่ง chunk สำหรับ RAG ใน Task 3</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ขั้นตอนที่ 5: Entity Extraction -->
+<section id="step-5">
+  <h2><span class="icon">5.4</span> การสกัด Entity &mdash; รายละเอียด</h2>
+
+  <div class="overview-box" style="margin-bottom:16px">
+    ขั้นตอนนี้สกัดข้อมูลสำคัญออกจากเนื้อหาของแต่ละมาตรา โดยใช้ regex ค้นหารูปแบบคำ แล้วเปลี่ยนข้อความกฎหมายดิบให้กลายเป็นข้อมูลที่มีโครงสร้าง เพื่อนำไปสร้าง <strong>Light Knowledge Graph</strong>
+  </div>
+
+  <h3>5.4.1 การสกัดโทษ (5 ประเภท)</h3>
+  <p>ใช้ regex ค้นหารูปแบบโทษในเนื้อหาของแต่ละมาตรา:</p>
+  <table>
+    <thead><tr><th>ประเภทโทษ</th><th>คำที่ค้นหา</th><th>รูปแบบ regex</th><th>ตัวอย่างในกฎหมาย</th><th>พบกี่มาตรา</th></tr></thead>
+    <tbody>
+      <tr><td><strong>จำคุก</strong></td><td>จำคุก</td><td><code>จำคุก...ปี/เดือน/วัน</code></td><td>"จำคุกไม่เกินสามปี"</td><td><strong>292</strong></td></tr>
+      <tr><td><strong>ปรับ</strong></td><td>ปรับ</td><td><code>ปรับ...บาท</code></td><td>"ปรับไม่เกินหกหมื่นบาท"</td><td><strong>257</strong></td></tr>
+      <tr><td><strong>ประหารชีวิต</strong></td><td>ประหารชีวิต</td><td><code>ประหารชีวิต</code></td><td>"ต้องระวางโทษประหารชีวิต"</td><td><strong>42</strong></td></tr>
+      <tr><td><strong>กักขัง</strong></td><td>กักขัง</td><td><code>กักขัง</code></td><td>"กักขังไม่เกินหนึ่งเดือน"</td><td>&mdash;</td></tr>
+      <tr><td><strong>ริบทรัพย์สิน</strong></td><td>ริบทรัพย์สิน</td><td><code>ริบทรัพย์สิน</code></td><td>"ศาลจะสั่งริบทรัพย์สิน"</td><td>&mdash;</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.4.2 รูปแบบโทษรวม</h3>
+  <p>เมื่อมาตราหนึ่งมีทั้งโทษจำคุกและปรับ ระบบจะวิเคราะห์ว่า<strong>รวมกันแบบไหน</strong>:</p>
+  <table>
+    <thead><tr><th>รูปแบบ</th><th>ความหมาย</th><th>ตัวอย่างในกฎหมาย</th></tr></thead>
+    <tbody>
+      <tr><td><code>both_mandatory</code></td><td>ทั้งจำคุก<strong>และ</strong>ปรับ (บังคับทั้งสองอย่าง)</td><td>"จำคุก...<strong>และ</strong>ปรับ..."</td></tr>
+      <tr><td><code>both_optional</code></td><td>จำคุก<strong>หรือ</strong>ปรับ (เลือกอย่างใดอย่างหนึ่ง หรือทั้งสอง)</td><td>"จำคุก...<strong>หรือ</strong>ปรับ...<strong>หรือทั้งจำทั้งปรับ</strong>"</td></tr>
+      <tr><td><code>imprisonment_only</code></td><td>จำคุกอย่างเดียว ไม่มีปรับ</td><td>"จำคุกไม่เกินหนึ่งปี"</td></tr>
+      <tr><td><code>fine_only</code></td><td>ปรับอย่างเดียว ไม่มีจำคุก</td><td>"ปรับไม่เกินหนึ่งพันบาท"</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.4.3 การสกัดการอ้างอิงข้ามมาตรา (Cross-references)</h3>
+  <p>ใช้ regex <code>มาตรา\s*([0-9]+(/[0-9]+)?)</code> ค้นหาคำว่า "มาตรา XX" ในเนื้อหา แล้วสร้างเส้นเชื่อมแบบมีทิศทาง:</p>
+  <div class="tree-view" style="margin-bottom:12px"><span style="color:#6b7280">เนื้อหามาตรา 339 เขียนว่า:</span> "...ลักทรัพย์โดยใช้กำลัง...ตาม<span style="color:#fbbf24">มาตรา 334</span>..."
+
+<span style="color:#6b7280">ผลลัพธ์:</span> สร้างเส้นเชื่อม <span style="color:#60a5fa">339</span> &rarr; <span style="color:#60a5fa">334</span>  (ความสัมพันธ์: "references")
+
+<span style="color:#6b7280">ทั้งหมดสกัดได้:</span> <span style="color:#a8e6cf">360 เส้นเชื่อม</span></div>
+
+  <h3>5.4.4 การตรวจจับคำศัพท์กฎหมาย (26 คำ)</h3>
+  <p>ค้นหาคำศัพท์กฎหมายสำคัญ 26 คำในแต่ละมาตรา เพื่อให้ Knowledge Graph รู้ว่ามาตราไหนเกี่ยวกับเรื่องอะไร:</p>
+  <table>
+    <thead><tr><th>คำศัพท์</th><th>ความหมาย</th><th>ใช้ในกรณี</th></tr></thead>
+    <tbody>
+      <tr><td>ผู้ใด</td><td>บุคคลใดก็ตาม</td><td>ใช้ขึ้นต้นมาตราความผิด ("ผู้ใดกระทำ...")</td></tr>
+      <tr><td>ต้องระวางโทษ</td><td>กำหนดโทษ</td><td>ใช้นำหน้าบทลงโทษ</td></tr>
+      <tr><td>โดยทุจริต</td><td>ด้วยเจตนาทุจริต</td><td>มาตราเกี่ยวกับการฉ้อโกง</td></tr>
+      <tr><td>ลักทรัพย์</td><td>ขโมย</td><td>มาตราเกี่ยวกับการลักทรัพย์</td></tr>
+      <tr><td>ฆ่า</td><td>ทำให้ตาย</td><td>มาตราเกี่ยวกับฆาตกรรม</td></tr>
+      <tr><td>ข่มขืนใจ</td><td>บังคับ</td><td>มาตราเกี่ยวกับการข่มขู่</td></tr>
+      <tr><td>ปลอม</td><td>ทำของปลอม</td><td>มาตราเกี่ยวกับการปลอมแปลง</td></tr>
+      <tr><td>ฉ้อโกง</td><td>หลอกลวงเอาทรัพย์</td><td>มาตราเกี่ยวกับการฉ้อโกง</td></tr>
+    </tbody>
+  </table>
+  <p style="color:var(--muted); font-size:13px; margin-top:4px">แสดง 8 จาก 26 คำ ดูรายการเต็มได้ใน notebook</p>
+
+  <h3>5.4.5 การสร้างกราฟด้วย NetworkX</h3>
+  <p>นำเส้นเชื่อมอ้างอิงข้ามมาตราทั้ง 360 เส้น มาสร้างเป็นกราฟแบบมีทิศทาง (Directed Graph):</p>
+  <div class="two-col">
+    <div>
+      <table>
+        <thead><tr><th>คุณสมบัติกราฟ</th><th>ค่า</th></tr></thead>
+        <tbody>
+          <tr><td>โหนด (Nodes)</td><td>มาตราแต่ละมาตรา</td></tr>
+          <tr><td>เส้นเชื่อม (Edges)</td><td>360 เส้น แบบมีทิศทาง</td></tr>
+          <tr><td>ไลบรารี</td><td>NetworkX (<code>DiGraph</code>)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <table>
+        <thead><tr><th>ไฟล์ที่ export</th><th>วัตถุประสงค์</th></tr></thead>
+        <tbody>
+          <tr><td><code>cross_reference_edges.json</code></td><td>รายการเส้นเชื่อมสำหรับสร้าง KG ใน Task 3</td></tr>
+          <tr><td><code>cross_references.gexf</code></td><td>ไฟล์กราฟสำหรับเปิดดูด้วยเครื่องมือ visualization เช่น Gephi</td></tr>
+          <tr><td><code>entities.json</code></td><td>ข้อมูล entity รายมาตรา (โทษ, การอ้างอิง, คำศัพท์)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ขั้นตอนที่ 6: Q&A Test Dataset -->
+<section id="step-6">
+  <h2><span class="icon">5.5</span> ชุดทดสอบถาม-ตอบ (Q&amp;A) &mdash; รายละเอียด</h2>
+
+  <div class="overview-box" style="margin-bottom:16px">
+    <strong>จุดประสงค์:</strong> สร้างคำถาม 20 ข้อด้วยมือ พร้อมคำตอบอ้างอิง (ground-truth) เพื่อ<strong>ประเมินผลความสามารถของ chatbot</strong> ใน Task 3 โดยเปรียบเทียบคำตอบของ chatbot กับคำตอบอ้างอิง เพื่อวัดความถูกต้องของทั้ง PageIndex และ PageIndex + Light KG
+  </div>
+
+  <h3>โครงสร้างข้อมูลต่อคำถาม</h3>
+  <table>
+    <thead><tr><th>ฟิลด์</th><th>คำอธิบาย</th><th>ตัวอย่าง</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>รหัสคำถาม</td><td><code>q01</code></td></tr>
+      <tr><td><code>question</code></td><td>คำถามเป็นภาษาไทย</td><td>"ความผิดฐานลักทรัพย์มีโทษอย่างไร?"</td></tr>
+      <tr><td><code>ground_truth_answer</code></td><td>คำตอบที่ถูกต้อง</td><td>"จำคุกไม่เกิน 3 ปี และปรับไม่เกิน 6,000 บาท ตามมาตรา 334"</td></tr>
+      <tr><td><code>reference_sections</code></td><td>มาตราที่เกี่ยวข้อง</td><td><code>["334"]</code></td></tr>
+      <tr><td><code>question_type</code></td><td>ประเภทคำถาม</td><td><code>penalty</code></td></tr>
+      <tr><td><code>difficulty</code></td><td>ระดับความยาก</td><td><code>easy</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="two-col" style="margin-top:16px">
+    <div>
+      <h3>5 ประเภทคำถาม</h3>
+      <table>
+        <thead><tr><th>ประเภท</th><th>จำนวน</th><th>อธิบาย</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag tag-penalty">โทษ</span></td><td>9</td><td>ถามว่าความผิดนี้มีโทษอะไร</td></tr>
+          <tr><td><span class="tag tag-definition">นิยาม</span></td><td>4</td><td>ถามความหมายของคำศัพท์กฎหมาย</td></tr>
+          <tr><td><span class="tag tag-procedure">วิธีการ</span></td><td>3</td><td>ถามเงื่อนไขหรือขั้นตอนทางกฎหมาย</td></tr>
+          <tr><td><span class="tag tag-comparison">เปรียบเทียบ</span></td><td>2</td><td>เปรียบเทียบความผิดหรือโทษหลายมาตรา</td></tr>
+          <tr><td><span class="tag tag-multihop">Multi-hop</span></td><td>2</td><td>ต้องรวมข้อมูลจากหลายมาตราเพื่อตอบ</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>3 ระดับความยาก</h3>
+      <table>
+        <thead><tr><th>ระดับ</th><th>จำนวน</th><th>อธิบาย</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag tag-easy">ง่าย</span></td><td>8</td><td>คำตอบอยู่ในมาตราเดียว หาได้ตรงๆ</td></tr>
+          <tr><td><span class="tag tag-medium">ปานกลาง</span></td><td>8</td><td>ต้องเข้าใจเงื่อนไข หรือเปรียบเทียบข้อมูล</td></tr>
+          <tr><td><span class="tag tag-hard">ยาก</span></td><td>4</td><td>ต้องรวมข้อมูลจากหลายมาตรา หรือตีความกฎหมาย</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h3 style="margin-top:20px">ทำไมต้องออกแบบแบบนี้?</h3>
+  <div class="overview-box">
+    การแบ่งประเภทและระดับความยากช่วยให้ประเมินผลได้ละเอียด:
+    <ul style="margin-top:8px">
+      <li><strong>PageIndex</strong> น่าจะตอบคำถาม <span class="tag tag-penalty">โทษ</span> + <span class="tag tag-easy">ง่าย</span> ได้ดี เพราะแค่หามาตราที่เกี่ยวข้อง</li>
+      <li><strong>PageIndex + KG</strong> น่าจะเก่งกว่าในคำถาม <span class="tag tag-multihop">Multi-hop</span> + <span class="tag tag-hard">ยาก</span> เพราะ KG สามารถตามเส้นเชื่อมข้ามมาตราได้</li>
+    </ul>
+    นี่คือหัวใจของโปรเจกต์: <strong>การเพิ่ม Knowledge Graph ช่วยให้ chatbot ตอบคำถามยากๆ ได้ดีขึ้นหรือไม่?</strong>
+  </div>
+</section>
+
+<!-- ═══════ OUTPUT FILES ═══════ -->
+<section id="outputs">
+  <h2><span class="icon">6</span> Output Files</h2>
+  <p>All preprocessed files are saved in <code>data/preprocessed/</code>:</p>
+  <table>
+    <thead>
+      <tr><th>File</th><th>Description</th><th>Format</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>preprocessed_criminal_code.csv</code></td>
+        <td>Main dataset with hierarchy + entity flags (444 rows, 21 cols)</td>
+        <td>CSV</td>
+      </tr>
+      <tr>
+        <td><code>hierarchy_tree.json</code></td>
+        <td>Nested tree structure for PageIndex (root &rarr; books &rarr; titles &rarr; divisions &rarr; sections)</td>
+        <td>JSON</td>
+      </tr>
+      <tr>
+        <td><code>entities.json</code></td>
+        <td>Per-section entity data for Light KG (penalties, cross-refs, legal terms)</td>
+        <td>JSON</td>
+      </tr>
+      <tr>
+        <td><code>cross_reference_edges.json</code></td>
+        <td>Edge list for KG (source &rarr; target with relation)</td>
+        <td>JSON</td>
+      </tr>
+      <tr>
+        <td><code>cross_references.gexf</code></td>
+        <td>Cross-reference graph for visualization tools</td>
+        <td>GEXF</td>
+      </tr>
+      <tr>
+        <td><code>full_parsed_with_headers.csv</code></td>
+        <td>Complete parsed data including intro sections</td>
+        <td>CSV</td>
+      </tr>
+      <tr>
+        <td><code>qa_test_dataset.json</code></td>
+        <td>Q&amp;A evaluation set with ground-truth answers</td>
+        <td>JSON</td>
+      </tr>
+      <tr>
+        <td><code>qa_test_dataset.csv</code></td>
+        <td>Q&amp;A evaluation set (flat format)</td>
+        <td>CSV</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════ Q&A TEST DATASET ═══════ -->
+<section id="qa">
+  <h2><span class="icon">7</span> Q&amp;A Test Dataset</h2>
+  <p>20 manually curated questions covering the Thai Criminal Code for evaluation:</p>
+
+  <div class="two-col">
+    <div>
+      <h3>By Question Type</h3>
+      <table>
+        <thead><tr><th>Type</th><th>Count</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag tag-penalty">Penalty</span></td><td>9</td><td>ความผิดฐานลักทรัพย์มีโทษอย่างไร?</td></tr>
+          <tr><td><span class="tag tag-definition">Definition</span></td><td>4</td><td>คำว่า 'โดยทุจริต' หมายความว่าอย่างไร?</td></tr>
+          <tr><td><span class="tag tag-procedure">Procedure</span></td><td>3</td><td>เด็กอายุเท่าไรจึงไม่ต้องรับโทษ?</td></tr>
+          <tr><td><span class="tag tag-comparison">Comparison</span></td><td>2</td><td>ลักทรัพย์ vs ชิงทรัพย์ vs ปล้นทรัพย์?</td></tr>
+          <tr><td><span class="tag tag-multihop">Multi-hop</span></td><td>2</td><td>พยายามฆ่าแต่ไม่สำเร็จ โทษเท่าไร?</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>By Difficulty Level</h3>
+      <div style="display:flex; gap:12px; margin: 14px 0 24px;">
+        <span class="tag tag-easy" style="padding:8px 20px; font-size:15px;">Easy: 8</span>
+        <span class="tag tag-medium" style="padding:8px 20px; font-size:15px;">Medium: 8</span>
+        <span class="tag tag-hard" style="padding:8px 20px; font-size:15px;">Hard: 4</span>
+      </div>
+      <p>Each question includes:</p>
+      <ul>
+        <li>Ground-truth answer in Thai</li>
+        <li>Reference section numbers (มาตรา)</li>
+        <li>Question type classification</li>
+        <li>Difficulty level</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ HOW TO RUN ═══════ -->
+<section id="howto">
+  <h2><span class="icon">8</span> How to Run</h2>
+
+  <div class="two-col">
+    <div>
+      <h3>Requirements</h3>
+      <ul>
+        <li>Python 3.11</li>
+        <li><code>pandas</code>, <code>numpy</code></li>
+        <li><code>pythainlp</code></li>
+        <li><code>matplotlib</code>, <code>seaborn</code></li>
+        <li><code>networkx</code></li>
+        <li><code>jupyter</code>, <code>ipykernel</code></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Steps</h3>
+      <pre><span class="comment"># Install packages (if needed)</span>
+<span class="cmd">pip install</span> pythainlp matplotlib seaborn \
+  jupyter ipykernel
+
+<span class="comment"># Register Python 3.11 kernel</span>
+<span class="cmd">python3.11 -m ipykernel install</span> --user \
+  --name python3.11 \
+  --display-name "Python 3.11"
+
+<span class="comment"># Run the notebook</span>
+<span class="cmd">jupyter notebook</span> task2_data_preprocessing.ipynb
+<span class="comment"># Select "Python 3.11" kernel and Run All</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FILE STRUCTURE ═══════ -->
+<section id="files">
+  <h2><span class="icon">9</span> File Structure</h2>
+  <div class="file-tree"><span class="dir">ML-Project/</span>
+├── <span class="file">README.md</span>              <span class="note">&larr; Project documentation (Markdown)</span>
+├── <span class="file">README.html</span>            <span class="note">&larr; Project documentation (this file)</span>
+├── <span class="file">task2_data_preprocessing.ipynb</span>  <span class="note">&larr; Main notebook</span>
+├── <span class="file">task2_report.html</span>      <span class="note">&larr; One-page summary report</span>
+├── <span class="file">CS652_Project_Sheet.pdf</span>
+├── <span class="file">Project_Proposal_6809036087.pdf</span>
+└── <span class="dir">data/</span>
+    ├── <span class="file">criminal-datasets.csv</span>         <span class="note">&larr; Raw data (downloaded)</span>
+    ├── <span class="file">eda_overview.png</span>              <span class="note">&larr; EDA visualization</span>
+    ├── <span class="file">eda_penalties_refs.png</span>        <span class="note">&larr; Penalty/cross-ref charts</span>
+    ├── <span class="file">eda_legal_terms.png</span>           <span class="note">&larr; Legal terms chart</span>
+    └── <span class="dir">preprocessed/</span>
+        ├── <span class="file">preprocessed_criminal_code.csv</span>
+        ├── <span class="file">hierarchy_tree.json</span>
+        ├── <span class="file">entities.json</span>
+        ├── <span class="file">cross_reference_edges.json</span>
+        ├── <span class="file">cross_references.gexf</span>
+        ├── <span class="file">full_parsed_with_headers.csv</span>
+        ├── <span class="file">qa_test_dataset.json</span>
+        └── <span class="file">qa_test_dataset.csv</span></div>
+</section>
+
+<!-- ═══════ NEXT STEPS ═══════ -->
+<section id="next">
+  <h2><span class="icon">10</span> Next Steps (Task 3: Model Development)</h2>
+  <ol>
+    <li>Build <strong>PageIndex tree</strong> from <code>hierarchy_tree.json</code> with LLM-based summarization for each node</li>
+    <li>Construct <strong>Light Knowledge Graph</strong> from <code>entities.json</code> + <code>cross_reference_edges.json</code></li>
+    <li>Implement retrieval pipelines (tree search, KG lookup, hybrid)</li>
+    <li>Build Q&amp;A chatbot using RAG with LLM</li>
+    <li>Evaluate using <code>qa_test_dataset.json</code></li>
+  </ol>
+</section>
+
+</div>
+
+<div class="footer">
+  CS652 Applied Machine Learning &mdash; Task 2: Data Collection &amp; Preprocessing &mdash; Student ID 6809036087
+</div>
+
+</body>
+</html>

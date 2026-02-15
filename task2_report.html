@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task 2: Data Collection & Preprocessing</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Fira+Code:wght@400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1a1a2e;
+    background: #f8f9fa;
+    padding: 20px;
+  }
+
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 40px 48px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border-radius: 8px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    border-bottom: 3px solid #16213e;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #16213e;
+    margin-bottom: 4px;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    color: #555;
+    font-weight: 400;
+  }
+  .header .meta {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #777;
+  }
+
+  /* Sections */
+  h2 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f3460;
+    margin: 20px 0 8px 0;
+    padding-bottom: 4px;
+    border-bottom: 2px solid #e94560;
+    display: inline-block;
+  }
+  h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #16213e;
+    margin: 10px 0 4px 0;
+  }
+
+  p, li { font-size: 13px; }
+  p { margin-bottom: 6px; }
+
+  /* Two-column layout */
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .cols-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6px 0 12px 0;
+    font-size: 12px;
+  }
+  th {
+    background: #16213e;
+    color: #fff;
+    padding: 6px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+  }
+  td {
+    padding: 5px 10px;
+    border-bottom: 1px solid #eee;
+  }
+  tr:nth-child(even) td { background: #f8f9fa; }
+  code {
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    background: #f0f0f0;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  /* Stats cards */
+  .stat-card {
+    background: linear-gradient(135deg, #16213e, #0f3460);
+    color: #fff;
+    border-radius: 8px;
+    padding: 12px 16px;
+    text-align: center;
+  }
+  .stat-card .num {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .stat-card .label {
+    font-size: 11px;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+  .stat-card.red { background: linear-gradient(135deg, #e94560, #c0392b); }
+  .stat-card.green { background: linear-gradient(135deg, #27ae60, #1e8449); }
+  .stat-card.purple { background: linear-gradient(135deg, #8e44ad, #6c3483); }
+
+  /* Tree */
+  .tree {
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    background: #1a1a2e;
+    color: #a8e6cf;
+    padding: 12px 16px;
+    border-radius: 6px;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+  .tree .hl { color: #ffd93d; font-weight: 600; }
+
+  /* Pipeline steps */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    margin: 8px 0;
+  }
+  .step {
+    background: #e8f4f8;
+    border-left: 3px solid #0f3460;
+    padding: 8px 10px;
+    border-radius: 0 6px 6px 0;
+    font-size: 11px;
+  }
+  .step .num {
+    font-weight: 700;
+    color: #0f3460;
+    font-size: 13px;
+  }
+  .step .title {
+    font-weight: 600;
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+  .step ul {
+    margin: 0;
+    padding-left: 14px;
+    font-size: 10px;
+    color: #444;
+  }
+
+  /* Lists */
+  ul { padding-left: 18px; margin: 4px 0; }
+  li { margin-bottom: 2px; font-size: 12px; }
+
+  /* File structure */
+  .file-tree {
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 10px 14px;
+    border-radius: 6px;
+    line-height: 1.5;
+  }
+
+  /* Q&A summary */
+  .qa-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .qa-box {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  .qa-box .tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #fff;
+    margin-right: 4px;
+  }
+  .tag-easy { background: #27ae60; }
+  .tag-medium { background: #f39c12; }
+  .tag-hard { background: #e74c3c; }
+
+  .overview-text {
+    background: #eef2ff;
+    border-left: 4px solid #0f3460;
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 12px;
+  }
+
+  @media print {
+    body { padding: 0; background: #fff; }
+    .page { box-shadow: none; padding: 20px 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="header">
+  <h1>Task 2: Data Collection & Preprocessing</h1>
+  <div class="subtitle">Comparing PageIndex vs PageIndex + Light Knowledge Graph for Thai Criminal Law Q&A Chatbot</div>
+  <div class="meta">
+    <span>CS652 Applied Machine Learning</span>
+    <span>Student ID: 6809036087</span>
+    <span>February 2026</span>
+  </div>
+</div>
+
+<!-- OVERVIEW -->
+<div class="overview-text">
+  This report documents the data collection and preprocessing of the <strong>Thai Criminal Code</strong> (ประมวลกฎหมายอาญา) dataset.
+  The preprocessed output feeds two downstream systems: <strong>PageIndex</strong> (vector-free RAG with hierarchical tree index) and
+  <strong>Light Knowledge Graph</strong> (legal entities and their relationships).
+</div>
+
+<!-- KEY STATS -->
+<div style="display:grid; grid-template-columns: repeat(5,1fr); gap:10px; margin-bottom:16px;">
+  <div class="stat-card"><div class="num">444</div><div class="label">Legal Sections (มาตรา)</div></div>
+  <div class="stat-card red"><div class="num">3</div><div class="label">Books (ภาค)</div></div>
+  <div class="stat-card green"><div class="num">15</div><div class="label">Titles (ลักษณะ)</div></div>
+  <div class="stat-card purple"><div class="num">360</div><div class="label">Cross-ref Edges</div></div>
+  <div class="stat-card"><div class="num">20</div><div class="label">Q&A Test Questions</div></div>
+</div>
+
+<!-- DATA SOURCE & STATS -->
+<div class="cols">
+  <div>
+    <h2>Data Source</h2>
+    <table>
+      <tr><th>Item</th><th>Detail</th></tr>
+      <tr><td>Source</td><td>PyThaiNLP/thai-law (GitHub)</td></tr>
+      <tr><td>Original</td><td>สำนักงานคณะกรรมการกฤษฎีกา</td></tr>
+      <tr><td>License</td><td>Public domain (Thai Copyright Act, Art. 7)</td></tr>
+      <tr><td>Format</td><td>CSV: <code>article</code>, <code>text</code>, <code>notes</code></td></tr>
+      <tr><td>Raw rows</td><td>453 (8 intro + 1 empty + 444 main)</td></tr>
+    </table>
+  </div>
+  <div>
+    <h2>Entity Extraction Stats</h2>
+    <table>
+      <tr><th>Entity Type</th><th>Count</th></tr>
+      <tr><td>Sections with imprisonment (จำคุก)</td><td>292</td></tr>
+      <tr><td>Sections with fines (ปรับ)</td><td>257</td></tr>
+      <tr><td>Sections with death penalty (ประหารชีวิต)</td><td>42</td></tr>
+      <tr><td>Cross-reference edges</td><td>360</td></tr>
+      <tr><td>Key legal terms tracked</td><td>26</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- CODE STRUCTURE -->
+<h2>Thai Criminal Code Structure</h2>
+<div class="tree">
+<span class="hl">ประมวลกฎหมายอาญา</span>
+├── <span class="hl">ภาค 1:</span> บทบัญญัติทั่วไป (General Provisions) — มาตรา 1-106 [112 sections]
+│   ├── ลักษณะ 1: บทบัญญัติที่ใช้แก่ความผิดทั่วไป (11 หมวด)
+│   └── ลักษณะ 2: บทบัญญัติที่ใช้แก่ความผิดลหุโทษ
+├── <span class="hl">ภาค 2:</span> ความผิด (Offenses) — มาตรา 107-366 [300 sections]
+│   ├── ลักษณะ 1: ความมั่นคงแห่งราชอาณาจักร (4 หมวด)
+│   ├── ลักษณะ 1/1: การก่อการร้าย
+│   ├── ลักษณะ 2-6: การปกครอง, การยุติธรรม, ศาสนา, ความสงบสุข, ภยันตราย
+│   ├── ลักษณะ 7-9: การปลอม, การค้า, เพศ
+│   ├── ลักษณะ 10: ชีวิตและร่างกาย (4 หมวด)
+│   ├── ลักษณะ 11: เสรีภาพและชื่อเสียง (3 หมวด)
+│   └── ลักษณะ 12: ทรัพย์ (8 หมวด: ลักทรัพย์, ชิงทรัพย์, ฉ้อโกง, ...)
+└── <span class="hl">ภาค 3:</span> ลหุโทษ (Petty Offenses) — มาตรา 367-398 [32 sections]
+</div>
+
+<!-- PIPELINE -->
+<h2>Preprocessing Pipeline</h2>
+<div class="pipeline">
+  <div class="step">
+    <div class="num">1</div>
+    <div class="title">Data Acquisition</div>
+    <ul><li>Download CSV from GitHub</li><li>453 rows, 3 columns</li></ul>
+  </div>
+  <div class="step">
+    <div class="num">2</div>
+    <div class="title">Data Cleaning</div>
+    <ul><li>Fill missing values</li><li>Thai text normalization</li><li>Remove empty rows</li></ul>
+  </div>
+  <div class="step">
+    <div class="num">3</div>
+    <div class="title">Hierarchy Mapping</div>
+    <ul><li>Official structure lookup</li><li>Handle slash articles</li><li>ภาค/ลักษณะ/หมวด</li></ul>
+  </div>
+  <div class="step">
+    <div class="num">4</div>
+    <div class="title">Text Preprocessing</div>
+    <ul><li>PyThaiNLP tokenization</li><li>newmm engine</li><li>Token counts</li></ul>
+  </div>
+  <div class="step">
+    <div class="num">5</div>
+    <div class="title">Entity Extraction</div>
+    <ul><li>Penalties (5 types)</li><li>Cross-references</li><li>26 legal terms</li></ul>
+  </div>
+  <div class="step">
+    <div class="num">6</div>
+    <div class="title">Q&A Dataset</div>
+    <ul><li>20 questions</li><li>5 types, 3 levels</li><li>Ground-truth answers</li></ul>
+  </div>
+</div>
+
+<!-- OUTPUT FILES & Q&A -->
+<div class="cols">
+  <div>
+    <h2>Output Files</h2>
+    <table>
+      <tr><th>File</th><th>Purpose</th></tr>
+      <tr><td><code>preprocessed_criminal_code.csv</code></td><td>Main dataset (444 rows, 21 cols)</td></tr>
+      <tr><td><code>hierarchy_tree.json</code></td><td>Nested tree for PageIndex</td></tr>
+      <tr><td><code>entities.json</code></td><td>Per-section entities for Light KG</td></tr>
+      <tr><td><code>cross_reference_edges.json</code></td><td>Edge list for Knowledge Graph</td></tr>
+      <tr><td><code>cross_references.gexf</code></td><td>Graph for visualization tools</td></tr>
+      <tr><td><code>full_parsed_with_headers.csv</code></td><td>Complete parsed data (incl. intro)</td></tr>
+      <tr><td><code>qa_test_dataset.json</code></td><td>Q&A evaluation set</td></tr>
+      <tr><td><code>qa_test_dataset.csv</code></td><td>Q&A evaluation set (CSV)</td></tr>
+    </table>
+  </div>
+  <div>
+    <h2>Q&A Test Dataset</h2>
+    <p style="margin-bottom:8px">20 manually curated questions covering the Thai Criminal Code:</p>
+    <table>
+      <tr><th>Type</th><th>Count</th><th>Example</th></tr>
+      <tr><td>Penalty</td><td>9</td><td>ความผิดฐานลักทรัพย์มีโทษอย่างไร?</td></tr>
+      <tr><td>Definition</td><td>4</td><td>คำว่า 'โดยทุจริต' หมายความว่าอย่างไร?</td></tr>
+      <tr><td>Procedure</td><td>3</td><td>เด็กอายุเท่าไรจึงไม่ต้องรับโทษ?</td></tr>
+      <tr><td>Comparison</td><td>2</td><td>ลักทรัพย์ vs ชิงทรัพย์ vs ปล้นทรัพย์?</td></tr>
+      <tr><td>Multi-hop</td><td>2</td><td>พยายามฆ่าแต่ไม่สำเร็จ โทษเท่าไร?</td></tr>
+    </table>
+    <div style="margin-top:8px">
+      <span class="tag tag-easy">Easy: 8</span>
+      <span class="tag tag-medium">Medium: 8</span>
+      <span class="tag tag-hard">Hard: 4</span>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLS & NEXT STEPS -->
+<div class="cols" style="margin-top:12px">
+  <div>
+    <h2>Tools & Libraries</h2>
+    <table>
+      <tr><th>Tool</th><th>Usage</th></tr>
+      <tr><td>Python 3.11</td><td>Runtime</td></tr>
+      <tr><td>pandas / numpy</td><td>Data manipulation</td></tr>
+      <tr><td>PyThaiNLP</td><td>Thai text normalization & tokenization</td></tr>
+      <tr><td>NetworkX</td><td>Cross-reference graph construction</td></tr>
+      <tr><td>matplotlib / seaborn</td><td>EDA visualizations</td></tr>
+      <tr><td>Jupyter Notebook</td><td>Interactive development</td></tr>
+    </table>
+  </div>
+  <div>
+    <h2>Next Steps (Task 3)</h2>
+    <ol style="font-size:12px; padding-left:18px;">
+      <li>Build <strong>PageIndex tree</strong> from <code>hierarchy_tree.json</code> with LLM-based node summarization</li>
+      <li>Construct <strong>Light Knowledge Graph</strong> from <code>entities.json</code> + <code>cross_reference_edges.json</code></li>
+      <li>Implement retrieval pipelines (tree search, KG lookup, hybrid)</li>
+      <li>Build Q&A chatbot using RAG with LLM</li>
+      <li>Evaluate using <code>qa_test_dataset.json</code></li>
+    </ol>
+    <h2>File Structure</h2>
+    <div class="file-tree">
+ML-Project/
+├── task2_data_preprocessing.ipynb
+├── task2_report.html
+├── data/
+│   ├── criminal-datasets.csv
+│   ├── eda_overview.png
+│   ├── eda_penalties_refs.png
+│   ├── eda_legal_terms.png
+│   └── preprocessed/
+│       ├── preprocessed_criminal_code.csv
+│       ├── hierarchy_tree.json
+│       ├── entities.json
+│       ├── cross_reference_edges.json
+│       ├── cross_references.gexf
+│       ├── qa_test_dataset.json
+│       └── qa_test_dataset.csv
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
